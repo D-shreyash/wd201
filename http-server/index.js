@@ -1,6 +1,6 @@
 const fs = require("fs");
 const http = require("http");
-const { register } = require("module");
+const minimist = require("minimist");
 
 let home = "";
 let project = "";
@@ -42,4 +42,9 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(3000);
+const args = minimist(process.argv.slice(2));
+const port = args.port;
+
+server.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
