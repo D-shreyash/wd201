@@ -1,2 +1,229 @@
-<div>nothing to show hear</div>
->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+
+      #registrationForm {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: auto;
+      }
+
+      #registrationForm label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
+      #registrationForm input[type="text"],
+      #registrationForm input[type="email"],
+      #registrationForm input[type="password"],
+      #registrationForm input[type="date"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      #registrationForm input[type="checkbox"] {
+        margin-right: 8px;
+      }
+
+      #registrationForm button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      #registrationForm button:hover {
+        background-color: #0056b3;
+      }
+
+      #dataTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      #dataTable th,
+      #dataTable td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+      }
+
+      #dataTable th {
+        color: black;
+        font-weight: bold;
+      }
+
+      #dataTable tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      #dataTable tr:hover {
+        background-color: #f1f1f1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- HTML -->
+    <form id="registrationForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" autocomplete="username" />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        autocomplete="current-password"
+        required
+      />
+
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" required />
+
+      <label for="terms">
+        <input type="checkbox" id="terms" required /> Accept Terms
+      </label>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th>Dob</th>
+          <th>Accepted terms?</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      document
+        .getElementById("registrationForm")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          // Collect form data
+          const name = document.getElementById("name").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const dobInput = document.getElementById("dob").value;
+          const termsAccepted = document.getElementById("terms").checked;
+
+          // Date validation
+          let dobValue = dobInput;
+          let dob = new Date(dobInput);
+          let today = new Date();
+          let age = today.getFullYear() - dob.getFullYear();
+          let monthDiff = today.getMonth() - dob.getMonth();
+          let dayDiff = today.getDate() - dob.getDate();
+
+          if (
+            age < 18 ||
+            age > 55 ||
+            (age === 55 && (monthDiff > 0 || (monthDiff === 0 && dayDiff > 0)))
+          ) {
+            alert("You must be between age 18 and 55.");
+            return;
+          }
+
+          // Email validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address.");
+            return;
+          }
+
+          // Create data object
+          const data = {
+            name,
+            email,
+            password,
+            dob: dobValue,
+            termsAccepted,
+          };
+
+          // Retrieve existing data from localStorage
+          let savedData = localStorage.getItem("formData");
+          let dataArray = savedData ? JSON.parse(savedData) : [];
+
+          // Add new data to the array
+          dataArray.push(data);
+
+          // Store the updated data array back to localStorage
+          localStorage.setItem("formData", JSON.stringify(dataArray));
+
+          // Update the table with the new data
+          renderTable();
+        });
+
+      function renderTable() {
+        // Retrieve data from localStorage
+        let savedData = localStorage.getItem("formData");
+        let dataArray = savedData ? JSON.parse(savedData) : [];
+        const tableBody = document.querySelector("#dataTable tbody");
+        tableBody.innerHTML = ""; // Clear existing table rows
+
+        // Populate the table with data
+        dataArray.forEach((entry) => {
+          let row = document.createElement("tr");
+
+          let nameCell = document.createElement("td");
+          nameCell.textContent = entry.name;
+          row.appendChild(nameCell);
+
+          let emailCell = document.createElement("td");
+          emailCell.textContent = entry.email;
+          row.appendChild(emailCell);
+
+          let passwordCell = document.createElement("td");
+          passwordCell.textContent = entry.password;
+          row.appendChild(passwordCell);
+
+          let dobCell = document.createElement("td");
+          dobCell.textContent = entry.dob;
+          row.appendChild(dobCell);
+
+          let termsCell = document.createElement("td");
+          termsCell.textContent = entry.termsAccepted;
+          row.appendChild(termsCell);
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Initial render of the table when the page loads
+      window.onload = renderTable;
+    </script>
+  </body>
+</html>
