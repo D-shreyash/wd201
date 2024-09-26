@@ -2,11 +2,16 @@
   "name": "todo-cli",
   "version": "1.0.0",
   "description": "",
-  "main": "todo.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^9.1.6",
+    "jest": "^29.7.0"
+  }
 }
