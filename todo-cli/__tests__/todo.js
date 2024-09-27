@@ -1,25 +1,64 @@
-const { todoList, formattedDate } = require("../todo.js"); // Adjust the path as needed
+/* eslint-disable no-undef */
+const todoList = require("../todo");
 
-// eslint-disable-next-line no-undef
+let { all, add, markAsComplete, overdue, dueToday, dueLater } = todoList();
+
 describe("Todo List Tests", () => {
-  let todos; // Variable to hold the todo list instance
-
-  // Initialize a new todo list before each test
-  // eslint-disable-next-line no-undef
-  beforeEach(() => {
-    todos = todoList(); // Create a new todo list instance
-  });
-
-  // eslint-disable-next-line no-undef
-  test("Should add a todo item", () => {
-    todos.add({
-      title: "Pay electric bill",
-      dueDate: formattedDate(new Date()),
+  beforeAll(() => {
+    add({
+      title: "task 1",
       completed: false,
+      dueDate: new Date().toISOString().split("T")[0],
     });
-    // eslint-disable-next-line no-undef
-    expect(todos.all[0].title).toBe("Pay electric bill");
+    add({
+      title: "task 2 overdue",
+      completed: false,
+      dueDate: new Date(new Date().setDate(new Date().getDate() - 1))
+        .toISOString()
+        .split("T")[0],
+    });
+    add({
+      title: "task 1 tomarrow",
+      completed: false,
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 1))
+        .toISOString()
+        .split("T")[0],
+    });
   });
 
-  // Add more tests here
+  test("should add", () => {
+    let len = all.length;
+
+    add({
+      title: "Adding task test 1",
+      completed: false,
+      dueDate: new Date().toISOString().split("T")[0],
+    });
+
+    expect(all.length).toBe(len + 1);
+  });
+
+  test("should mark as complete", () => {
+    expect(all[0].completed).toBe(false);
+    markAsComplete(0);
+    expect(all[0].completed).toBe(true);
+  });
+
+  test("should test overdue", () => {
+    let overdueItem = overdue();
+    expect(overdueItem.length).toBe(1);
+    expect(overdueItem[0].title).toBe("task 2 overdue");
+  });
+
+  test("should give due today", () => {
+    let dueTodayItem = dueToday();
+    expect(dueTodayItem.length).toBe(2);
+    expect(dueTodayItem[0].title).toBe("task 1");
+  });
+
+  test("should give due later", () => {
+    let dueLaterItem = dueLater();
+    expect(dueLaterItem.length).toBe(1);
+    expect(dueLaterItem[0].title).toBe("task 1 tomarrow");
+  });
 });
